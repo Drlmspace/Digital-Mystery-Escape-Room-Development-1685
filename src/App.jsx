@@ -5,6 +5,7 @@ import { AudioProvider } from './contexts/AudioContext';
 import StartScreen from './components/StartScreen';
 import GameScreen from './components/GameScreen';
 import AdminDashboard from './components/AdminDashboard';
+import Leaderboard from './components/Leaderboard';
 import './App.css';
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
               <Route path="/" element={<StartScreen />} />
               <Route path="/game" element={<GameScreen />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/leaderboard" element={<Leaderboard />} />
             </Routes>
           </div>
         </Router>

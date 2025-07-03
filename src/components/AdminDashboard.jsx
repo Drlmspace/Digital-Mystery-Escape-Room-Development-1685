@@ -7,7 +7,7 @@ import { gameData } from '../data/gameData';
 import SafeIcon from '../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
-const { FiSettings, FiUsers, FiClock, FiVolumeX, FiVolume2, FiHome, FiDownload, FiUpload, FiMusic, FiPlay, FiPause, FiTrash2, FiCheck, FiMic, FiHeadphones, FiRefreshCw, FiDatabase, FiHelpCircle, FiKey, FiEye, FiEyeOff, FiSearch, FiFilter } = FiIcons;
+const { FiSettings, FiUsers, FiClock, FiVolumeX, FiVolume2, FiHome, FiDownload, FiUpload, FiMusic, FiPlay, FiPause, FiTrash2, FiCheck, FiMic, FiHeadphones, FiRefreshCw, FiDatabase, FiHelpCircle, FiKey, FiEye, FiEyeOff, FiSearch, FiFilter, FiTrophy } = FiIcons;
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
@@ -548,6 +548,13 @@ export default function AdminDashboard() {
               >
                 <SafeIcon icon={FiRefreshCw} className="text-lg" />
                 <span className="text-sm">Last: {lastRefresh.toLocaleTimeString()}</span>
+              </button>
+              <button
+                onClick={() => navigate('/leaderboard')}
+                className="flex items-center gap-2 px-4 py-2 bg-gold-500 text-mystery-900 rounded-lg hover:bg-gold-600 transition-colors accessibility-focus font-semibold"
+              >
+                <SafeIcon icon={FiTrophy} className="text-lg" />
+                Leaderboard
               </button>
               <button
                 onClick={() => navigate('/')}

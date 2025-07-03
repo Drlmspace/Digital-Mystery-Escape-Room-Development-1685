@@ -63,6 +63,79 @@ export const dbHelpers = {
     return data
   },
 
+  // Leaderboard
+  async getLeaderboard(timeFilter = 'all', difficultyFilter = 'all', statusFilter = 'all') {
+    let query = supabase
+      .from('teams_escaperoom_2024')
+      .select(`
+        id,
+        team_name,
+        player_names,
+        difficulty,
+        game_state,
+        start_time,
+        current_stage,
+        hints_used,
+        total_time_seconds,
+        created_at,
+        stages_completed:current_stage
+      `)
+
+    // Time filter
+    if (timeFilter !== 'all') {
+      const now = new Date()
+      let startDate
+      
+      switch (timeFilter) {
+        case 'today':
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+          break
+        case 'week':
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+          break
+        case 'month':
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+          break
+      }
+      
+      if (startDate) {
+        query = query.gte('created_at', startDate.toISOString())
+      }
+    }
+
+    // Difficulty filter
+    if (difficultyFilter !== 'all') {
+      query = query.eq('difficulty', difficultyFilter)
+    }
+
+    // Status filter
+    if (statusFilter !== 'all') {
+      if (statusFilter === 'completed') {
+        query = query.eq('game_state', 'completed')
+      } else if (statusFilter === 'active') {
+        query = query.in('game_state', ['playing', 'paused'])
+      }
+    }
+
+    // Order by completion and performance
+    query = query.order('game_state', { ascending: false }) // completed first
+      .order('current_stage', { ascending: false }) // more stages first
+      .order('total_time_seconds', { ascending: true }) // less time first
+      .order('hints_used', { ascending: true }) // fewer hints first
+
+    const { data, error } = await query
+
+    if (error) throw error
+
+    // Calculate additional metrics
+    return data?.map((team, index) => ({
+      ...team,
+      rank: index + 1,
+      stages_completed: team.game_state === 'completed' ? 6 : team.current_stage,
+      completion_rate: team.game_state === 'completed' ? 100 : (team.current_stage / 6) * 100
+    })) || []
+  },
+
   // Game Sessions
   async createGameSession(sessionData) {
     const { data, error } = await supabase
@@ -220,24 +293,75 @@ export const dbHelpers = {
     return data
   },
 
+  // Leaderboard Statistics
+  async getLeaderboardStats(timeFilter = 'all', difficultyFilter = 'all') {
+    let query = supabase
+      .from('teams_escaperoom_2024')
+      .select('total_time_seconds, game_state, current_stage, hints_used, difficulty, created_at')
+
+    // Apply filters
+    if (timeFilter !== 'all') {
+      const now = new Date()
+      let startDate
+      
+      switch (timeFilter) {
+        case 'today':
+          startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+          break
+        case 'week':
+          startDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+          break
+        case 'month':
+          startDate = new Date(now.getFullYear(), now.getMonth(), 1)
+          break
+      }
+      
+      if (startDate) {
+        query = query.gte('created_at', startDate.toISOString())
+      }
+    }
+
+    if (difficultyFilter !== 'all') {
+      query = query.eq('difficulty', difficultyFilter)
+    }
+
+    const { data, error } = await query
+
+    if (error) throw error
+    return data || []
+  },
+
   // Real-time subscriptions
   subscribeToTeamUpdates(callback) {
     return supabase
       .channel('teams_updates')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'teams_escaperoom_2024' }, 
-        callback
-      )
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'teams_escaperoom_2024'
+      }, callback)
       .subscribe()
   },
 
   subscribeToGameSessions(callback) {
     return supabase
       .channel('game_sessions_updates')
-      .on('postgres_changes', 
-        { event: '*', schema: 'public', table: 'game_sessions_escaperoom_2024' }, 
-        callback
-      )
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'game_sessions_escaperoom_2024'
+      }, callback)
+      .subscribe()
+  },
+
+  subscribeToLeaderboard(callback) {
+    return supabase
+      .channel('leaderboard_updates')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'teams_escaperoom_2024'
+      }, callback)
       .subscribe()
   }
 }

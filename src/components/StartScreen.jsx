@@ -6,7 +6,7 @@ import { useAudio } from '../contexts/AudioContext';
 import SafeIcon from '../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
-const { FiPlay, FiUsers, FiSettings, FiInfo, FiVolumeX, FiVolume2, FiDatabase } = FiIcons;
+const { FiPlay, FiUsers, FiSettings, FiInfo, FiVolumeX, FiVolume2, FiDatabase, FiTrophy } = FiIcons;
 
 export default function StartScreen() {
   const navigate = useNavigate();
@@ -39,7 +39,6 @@ export default function StartScreen() {
   const startGame = async () => {
     if (teamName.trim() && playerNames.every(name => name.trim())) {
       setIsStarting(true);
-      
       try {
         const teamInfo = {
           teamName: teamName.trim(),
@@ -66,6 +65,10 @@ export default function StartScreen() {
 
   const goToAdmin = () => {
     navigate('/admin');
+  };
+
+  const goToLeaderboard = () => {
+    navigate('/leaderboard');
   };
 
   return (
@@ -214,6 +217,7 @@ export default function StartScreen() {
                 <li>• Auto-save progress feature</li>
                 <li>• Cloud backup with Supabase</li>
                 <li>• Real-time team monitoring</li>
+                <li>• Global leaderboard rankings</li>
                 <li>• Fully accessible design</li>
               </ul>
             </div>
@@ -240,8 +244,15 @@ export default function StartScreen() {
                   {showRules ? 'Hide Rules' : 'Show Rules'}
                 </button>
                 <button
-                  onClick={goToAdmin}
+                  onClick={goToLeaderboard}
                   className="flex items-center gap-3 px-4 py-2 bg-gold-500 text-mystery-900 rounded-lg hover:bg-gold-600 transition-colors accessibility-focus font-semibold"
+                >
+                  <SafeIcon icon={FiTrophy} className="text-xl" />
+                  View Leaderboard
+                </button>
+                <button
+                  onClick={goToAdmin}
+                  className="flex items-center gap-3 px-4 py-2 bg-mystery-700 text-mystery-200 rounded-lg hover:bg-mystery-600 transition-colors accessibility-focus"
                 >
                   <SafeIcon icon={FiDatabase} className="text-xl" />
                   Admin Dashboard
@@ -268,6 +279,7 @@ export default function StartScreen() {
                   <li>• Progress is automatically saved to cloud</li>
                   <li>• Work together as a team</li>
                   <li>• Admin can monitor progress in real-time</li>
+                  <li>• Compete on the global leaderboard</li>
                 </ul>
               </motion.div>
             )}
