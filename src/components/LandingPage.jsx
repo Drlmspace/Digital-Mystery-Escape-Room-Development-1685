@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import SafeIcon from '../common/SafeIcon';
+import FeedbackButton from './feedback/FeedbackButton';
 import PolicyFooter from './common/PolicyFooter';
 import * as FiIcons from 'react-icons/fi';
 
@@ -26,7 +27,7 @@ export default function LandingPage() {
           <p className="text-xl text-mystery-200 max-w-2xl mx-auto mb-8">
             A 60-minute interactive investigation experience. Can you solve the mysterious disappearance of Dr. Eleanor Blackwood?
           </p>
-          
+
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <motion.button
@@ -39,7 +40,7 @@ export default function LandingPage() {
               <SafeIcon icon={FiLogIn} className="text-xl" />
               Sign In to Play
             </motion.button>
-            
+
             <motion.button
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -97,7 +98,7 @@ export default function LandingPage() {
                 <SafeIcon icon={FiTrophy} className="text-xl" />
                 View Leaderboard
               </button>
-              
+
               <button
                 onClick={() => navigate('/admin')}
                 className="w-full flex items-center gap-3 px-4 py-2 bg-mystery-700 text-mystery-200 rounded-lg hover:bg-mystery-600 transition-colors"
@@ -105,6 +106,13 @@ export default function LandingPage() {
                 <SafeIcon icon={FiDatabase} className="text-xl" />
                 Admin Dashboard
               </button>
+
+              {/* Feedback Button */}
+              <FeedbackButton 
+                variant="inline" 
+                size="medium" 
+                className="w-full justify-center"
+              />
             </div>
 
             <div className="mt-6 p-4 bg-mystery-800 rounded-lg">
@@ -130,8 +138,8 @@ export default function LandingPage() {
           <div className="prose prose-lg max-w-none text-mystery-100 narrative-text">
             <p className="mb-4">
               Dr. Eleanor Blackwood, the renowned curator of the Metropolitan Museum of Digital Arts, 
-              has vanished without a trace. Her office remains locked, her research incomplete, 
-              and strange inconsistencies have been discovered in the museum's latest acquisitions.
+              has vanished without a trace. Her office remains locked, her research incomplete, and 
+              strange inconsistencies have been discovered in the museum's latest acquisitions.
             </p>
             <p className="text-center font-semibold text-gold-400">
               Can you uncover the truth behind her disappearance and expose the conspiracy within?

@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useGame } from '../contexts/GameContext';
 import { useAudio } from '../contexts/AudioContext';
 import SavedGameCard from './SavedGameCard';
+import FeedbackSection from './feedback/FeedbackSection';
 import SafeIcon from '../common/SafeIcon';
 import PolicyFooter from './common/PolicyFooter';
 import * as FiIcons from 'react-icons/fi';
@@ -16,7 +17,7 @@ export default function Dashboard() {
   const { user, logout } = useAuth();
   const { startGameWithDatabase, loadSavedGame, deleteSavedGame } = useGame();
   const { isMuted, dispatch: audioDispatch } = useAudio();
-  
+
   const [teamName, setTeamName] = useState('');
   const [playerNames, setPlayerNames] = useState(['']);
   const [difficulty, setDifficulty] = useState('medium');
@@ -24,6 +25,7 @@ export default function Dashboard() {
   const [isStarting, setIsStarting] = useState(false);
   const [savedGame, setSavedGame] = useState(null);
   const [showNewGameForm, setShowNewGameForm] = useState(false);
+  const [showFeedbackSection, setShowFeedbackSection] = useState(false);
 
   // Check for saved game on component mount
   useEffect(() => {
@@ -208,7 +210,7 @@ export default function Dashboard() {
                       onClick={() => setShowNewGameForm(false)}
                       className="text-mystery-400 hover:text-mystery-200 transition-colors"
                     >
-                      <SafeIcon icon={FiRefreshCw} className="text-lg" />
+                      <SafeIcon icon={FiRefreshCcw} className="text-lg" />
                     </button>
                   )}
                 </div>
@@ -348,7 +350,7 @@ export default function Dashboard() {
                   <SafeIcon icon={isMuted ? FiVolumeX : FiVolume2} className="text-xl" />
                   {isMuted ? 'Unmute Audio' : 'Mute Audio'}
                 </button>
-                
+
                 <button
                   onClick={() => setShowRules(!showRules)}
                   className="flex items-center gap-3 px-4 py-2 bg-mystery-700 text-mystery-200 rounded-lg hover:bg-mystery-600 transition-colors accessibility-focus"
@@ -356,7 +358,7 @@ export default function Dashboard() {
                   <SafeIcon icon={FiInfo} className="text-xl" />
                   {showRules ? 'Hide Rules' : 'Show Rules'}
                 </button>
-                
+
                 <button
                   onClick={goToLeaderboard}
                   className="flex items-center gap-3 px-4 py-2 bg-gold-500 text-mystery-900 rounded-lg hover:bg-gold-600 transition-colors accessibility-focus font-semibold"
@@ -364,13 +366,21 @@ export default function Dashboard() {
                   <SafeIcon icon={FiTrophy} className="text-xl" />
                   View Leaderboard
                 </button>
-                
+
                 <button
                   onClick={goToAdmin}
                   className="flex items-center gap-3 px-4 py-2 bg-mystery-700 text-mystery-200 rounded-lg hover:bg-mystery-600 transition-colors accessibility-focus"
                 >
                   <SafeIcon icon={FiDatabase} className="text-xl" />
                   Admin Dashboard
+                </button>
+
+                <button
+                  onClick={() => setShowFeedbackSection(!showFeedbackSection)}
+                  className="flex items-center gap-3 px-4 py-2 bg-mystery-700 text-mystery-200 rounded-lg hover:bg-mystery-600 transition-colors accessibility-focus"
+                >
+                  <SafeIcon icon={FiUsers} className="text-xl" />
+                  {showFeedbackSection ? 'Hide Feedback' : 'Share Feedback'}
                 </button>
               </div>
             </div>
@@ -415,6 +425,17 @@ export default function Dashboard() {
             )}
           </motion.div>
         </div>
+
+        {/* Feedback Section */}
+        {showFeedbackSection && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8"
+          >
+            <FeedbackSection />
+          </motion.div>
+        )}
 
         {/* Footer */}
         <motion.div

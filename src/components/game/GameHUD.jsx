@@ -4,6 +4,7 @@ import { useGame } from '../../contexts/GameContext';
 import { useAudio } from '../../contexts/AudioContext';
 import { useNavigate } from 'react-router-dom';
 import SaveExitModal from './SaveExitModal';
+import FeedbackButton from '../feedback/FeedbackButton';
 import SafeIcon from '../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
@@ -13,6 +14,7 @@ export default function GameHUD() {
   const navigate = useNavigate();
   const { currentStage, startTime, gameState, dispatch, getAvailableHints, currentStageData } = useGame();
   const { isMuted, dispatch: audioDispatch } = useAudio();
+
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [showHints, setShowHints] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -101,6 +103,7 @@ export default function GameHUD() {
                   <SafeIcon icon={FiHelpCircle} className="text-lg" />
                   <span>{availableHints}</span>
                 </button>
+
                 {showHints && (
                   <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -120,6 +123,13 @@ export default function GameHUD() {
                   </motion.div>
                 )}
               </div>
+
+              {/* Feedback Button in Header */}
+              <FeedbackButton 
+                variant="header" 
+                size="small" 
+                showText={false}
+              />
 
               {/* Menu Button */}
               <div className="relative">
@@ -228,10 +238,7 @@ export default function GameHUD() {
 
       {/* Click outside to close menu */}
       {showMenu && (
-        <div
-          className="fixed inset-0 z-30"
-          onClick={() => setShowMenu(false)}
-        />
+        <div className="fixed inset-0 z-30" onClick={() => setShowMenu(false)} />
       )}
     </>
   );

@@ -7,6 +7,8 @@ import NarrativeSection from './game/NarrativeSection';
 import PuzzleSection from './game/PuzzleSection';
 import GameHUD from './game/GameHUD';
 import GameComplete from './game/GameComplete';
+import FeedbackButton from './feedback/FeedbackButton';
+import FeedbackPrompt from './feedback/FeedbackPrompt';
 
 export default function GameScreen() {
   const { gameState, currentStage, currentStageData, canAdvance, dispatch } = useGame();
@@ -81,19 +83,24 @@ export default function GameScreen() {
                 className="space-y-8"
               >
                 <NarrativeSection 
-                  narrative={currentStageData.narrative}
-                  stageTitle={currentStageData.title}
+                  narrative={currentStageData.narrative} 
+                  stageTitle={currentStageData.title} 
                 />
-                
                 <PuzzleSection 
-                  puzzles={currentStageData.puzzles}
-                  onAdvance={handleAdvanceStage}
+                  puzzles={currentStageData.puzzles} 
+                  onAdvance={handleAdvanceStage} 
                 />
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Floating Feedback Button */}
+      <FeedbackButton variant="floating" />
+      
+      {/* Smart Feedback Prompts */}
+      <FeedbackPrompt />
     </div>
   );
 }
