@@ -14,6 +14,7 @@ export default function NarrativeSection({ narrative, stageTitle }) {
   const { audioMessages, playAudioMessage } = useAudio();
   const { currentStage } = useGame();
   const [stageAudioUrl, setStageAudioUrl] = useState(null);
+  const [currentAudio, setCurrentAudio] = useState(null);
 
   // Map current stage to audio message key
   const getStageAudioKey = () => {
@@ -38,18 +39,43 @@ export default function NarrativeSection({ narrative, stageTitle }) {
 
   const toggleAudio = () => {
     const audioKey = getStageAudioKey();
+    
     if (audioKey && audioMessages[audioKey]) {
       if (isPlaying) {
+        // Stop current audio
+        if (currentAudio) {
+          currentAudio.pause();
+          currentAudio.currentTime = 0;
+        }
         setIsPlaying(false);
-        // Stop audio playback
       } else {
-        setIsPlaying(true);
-        playAudioMessage(audioKey);
-        
-        // Auto-stop after reasonable time (adjust based on your audio length)
-        setTimeout(() => {
-          setIsPlaying(false);
-        }, 60000); // 1 minute for stage narrations
+        // Play audio from URL link
+        try {
+          const audio = new Audio(audioMessages[audioKey]);
+          audio.volume = 0.7; // Background volume
+          audio.play().then(() => {
+            setCurrentAudio(audio);
+            setIsPlaying(true);
+            
+            // Handle when audio ends
+            audio.onended = () => {
+              setIsPlaying(false);
+              setCurrentAudio(null);
+            };
+            
+            // Handle errors
+            audio.onerror = () => {
+              console.error('Failed to play stage narration');
+              setIsPlaying(false);
+              setCurrentAudio(null);
+            };
+          }).catch(error => {
+            console.error('Failed to play stage narration:', error);
+            setIsPlaying(false);
+          });
+        } catch (error) {
+          console.error('Error creating audio element:', error);
+        }
       }
     }
   };
@@ -64,8 +90,9 @@ export default function NarrativeSection({ narrative, stageTitle }) {
         <h2 className="text-3xl font-serif font-bold text-gold-400">
           {stageTitle}
         </h2>
+        
         <div className="flex items-center gap-3">
-          {/* Stage Narration Audio */}
+          {/* Stage Narration Audio Link */}
           {stageAudioUrl && (
             <button
               onClick={toggleAudio}
@@ -124,7 +151,7 @@ export default function NarrativeSection({ narrative, stageTitle }) {
       {stageAudioUrl && (
         <div className="mb-4 p-3 bg-gold-500/20 border border-gold-400 rounded-lg">
           <p className="text-gold-400 text-sm text-center">
-            🎧 Custom stage narration loaded from admin dashboard
+            🎧 Stage narration playing in background from URL link
           </p>
         </div>
       )}
@@ -187,7 +214,10 @@ export default function NarrativeSection({ narrative, stageTitle }) {
             <SafeIcon icon={FiFileText} className="text-gold-400 text-xl" />
             <div className="flex-1">
               <p className="text-mystery-200 text-sm">
-                {stageAudioUrl ? 'Custom stage narration available (uploaded via admin)' : 'Audio narration available for this section'}
+                {stageAudioUrl 
+                  ? 'Stage narration playing from URL link (no download required)'
+                  : 'Audio narration available for this section'
+                }
               </p>
               <div className="mt-2 h-1 bg-mystery-700 rounded-full overflow-hidden">
                 <div 
