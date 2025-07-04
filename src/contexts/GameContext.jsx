@@ -60,6 +60,7 @@ function gameReducer(state, action) {
           completedAt: Date.now()
         }
       };
+      
       return {
         ...state,
         puzzleStates: newPuzzleStates,
@@ -100,6 +101,7 @@ function gameReducer(state, action) {
     case 'RECORD_INCORRECT_ATTEMPT':
       const stageKey = `${state.currentStage}-${action.payload.puzzleId}`;
       const currentAttempts = state.incorrectAttempts[stageKey] || 0;
+      
       return {
         ...state,
         incorrectAttempts: {
@@ -177,16 +179,58 @@ export function GameProvider({ children }) {
             current_stage: state.currentStage,
             game_state: state.gameState,
             hints_used: state.hintsUsed,
-            total_time_seconds: state.startTime ? Math.floor((Date.now() - state.startTime) / 1000) : 0
+            total_time_seconds: state.startTime ? Math.floor((Date.now() - state.startTime) / 1000) : 0,
+            stages_completed: state.completedStages.length
           });
 
-          // Update game session
-          await dbHelpers.updateGameSession(state.teamId, {
-            stage_progress: state.completedStages,
-            puzzle_states: state.puzzleStates,
-            incorrect_attempts: state.incorrectAttempts,
-            game_stats: state.gameStats
-          });
+          // Update or create game session
+          try {
+            await dbHelpers.updateGameSession(state.teamId, {
+              stage_progress: state.completedStages,
+              puzzle_states: state.puzzleStates,
+              incorrect_attempts: state.incorrectAttempts,
+              game_stats: state.gameStats
+            });
+          } catch (updateError) {
+            // If update fails, try to create new session
+            if (updateError.code === 'PGRST116') { // Not found
+              await dbHelpers.createGameSession({
+                team_id: state.teamId,
+                session_data: {},
+                stage_progress: state.completedStages,
+                puzzle_states: state.puzzleStates,
+                incorrect_attempts: state.incorrectAttempts,
+                game_stats: state.gameStats
+              });
+            } else {
+              throw updateError;
+            }
+          }
+
+          // Update or create game statistics
+          try {
+            await dbHelpers.updateGameStatistics(state.teamId, {
+              total_time_seconds: state.startTime ? Math.floor((Date.now() - state.startTime) / 1000) : 0,
+              puzzles_solved: state.gameStats.puzzlesSolved,
+              hints_used: state.hintsUsed,
+              completion_rate: (state.completedStages.length / 6) * 100,
+              performance_score: calculatePerformanceScore(state)
+            });
+          } catch (statsError) {
+            // If update fails, try to create new statistics
+            if (statsError.code === 'PGRST116') { // Not found
+              await dbHelpers.createGameStatistics(state.teamId, {
+                total_time_seconds: state.startTime ? Math.floor((Date.now() - state.startTime) / 1000) : 0,
+                puzzles_solved: state.gameStats.puzzlesSolved,
+                hints_used: state.hintsUsed,
+                completion_rate: (state.completedStages.length / 6) * 100,
+                performance_score: calculatePerformanceScore(state)
+              });
+            } else {
+              throw statsError;
+            }
+          }
+
         } catch (error) {
           console.error('Failed to save to database:', error);
         }
@@ -243,6 +287,14 @@ export function GameProvider({ children }) {
     loadSavedGame();
   }, []);
 
+  // Calculate performance score
+  const calculatePerformanceScore = (gameState) => {
+    const completionRate = (gameState.completedStages.length / 6) * 100;
+    const timeScore = gameState.startTime ? Math.max(0, 100 - ((Date.now() - gameState.startTime) / 3600000) * 100) : 0;
+    const hintPenalty = gameState.hintsUsed * 5;
+    return Math.max(0, completionRate + timeScore - hintPenalty);
+  };
+
   // Create team in database when starting game
   const startGameWithDatabase = async (teamInfo) => {
     try {
@@ -253,7 +305,8 @@ export function GameProvider({ children }) {
         game_state: 'playing',
         start_time: new Date().toISOString(),
         current_stage: 0,
-        hints_used: 0
+        hints_used: 0,
+        stages_completed: 0
       };
 
       const team = await dbHelpers.createTeam(teamData);
@@ -262,9 +315,24 @@ export function GameProvider({ children }) {
       await dbHelpers.createGameSession({
         team_id: team.id,
         session_data: {},
-        stage_progress: {},
+        stage_progress: [],
         puzzle_states: {},
-        incorrect_attempts: {}
+        incorrect_attempts: {},
+        game_stats: {
+          totalTime: 0,
+          hintsUsed: 0,
+          puzzlesSolved: 0,
+          totalPuzzles: 0
+        }
+      });
+
+      // Create initial game statistics
+      await dbHelpers.createGameStatistics(team.id, {
+        total_time_seconds: 0,
+        puzzles_solved: 0,
+        hints_used: 0,
+        completion_rate: 0,
+        performance_score: 0
       });
 
       dispatch({ type: 'SET_TEAM_ID', payload: { teamId: team.id } });
@@ -330,6 +398,7 @@ export function GameProvider({ children }) {
     loadSavedGame,
     deleteSavedGame,
     recordPuzzleAttemptInDB,
+    
     canAdvance: () => {
       const currentStageData = gameData.stages[state.currentStage];
       if (!currentStageData) return false;
@@ -339,16 +408,23 @@ export function GameProvider({ children }) {
         return state.puzzleStates[puzzleKey]?.completed || false;
       });
     },
+
     getIncorrectAttempts: (puzzleId) => {
       const key = `${state.currentStage}-${puzzleId}`;
       return state.incorrectAttempts[key] || 0;
     },
+
     isPuzzleCompleted: (puzzleId) => {
       const key = `${state.currentStage}-${puzzleId}`;
       return state.puzzleStates[key]?.completed || false;
     },
+
     getAvailableHints: () => {
-      const difficultyHints = { easy: 5, medium: 3, hard: 1 };
+      const difficultyHints = {
+        easy: 5,
+        medium: 3,
+        hard: 1
+      };
       return difficultyHints[state.difficulty] - state.hintsUsed;
     }
   };
