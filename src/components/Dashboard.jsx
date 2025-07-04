@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { useGame } from '../contexts/GameContext';
 import { useAudio } from '../contexts/AudioContext';
 import SavedGameCard from './SavedGameCard';
 import SafeIcon from '../common/SafeIcon';
+import PolicyFooter from './common/PolicyFooter';
 import * as FiIcons from 'react-icons/fi';
 
-const { FiPlay, FiUsers, FiSettings, FiInfo, FiVolumeX, FiVolume2, FiDatabase, FiTrophy, FiRefreshCw, FiTrash2 } = FiIcons;
+const { FiPlay, FiUsers, FiSettings, FiInfo, FiVolumeX, FiVolume2, FiDatabase, FiTrophy, FiRefreshCw, FiTrash2, FiLogOut, FiUser } = FiIcons;
 
-export default function StartScreen() {
+export default function Dashboard() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const { startGameWithDatabase, loadSavedGame, deleteSavedGame } = useGame();
   const { isMuted, dispatch: audioDispatch } = useAudio();
   
@@ -110,6 +113,15 @@ export default function StartScreen() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
   const toggleMute = () => {
     audioDispatch({ type: 'TOGGLE_MUTE' });
   };
@@ -128,13 +140,34 @@ export default function StartScreen() {
   return (
     <div className="min-h-screen mystery-gradient flex items-center justify-center p-4">
       <div className="max-w-5xl w-full">
-        {/* Header */}
+        {/* Header with User Info */}
         <motion.div
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="text-center mb-12"
+          className="text-center mb-8"
         >
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <SafeIcon icon={FiUser} className="text-2xl text-gold-400" />
+              <div className="text-left">
+                <h2 className="text-lg font-semibold text-gold-400">
+                  Welcome, {user?.firstName || user?.email}
+                </h2>
+                <p className="text-sm text-mystery-300">
+                  Ready for your investigation?
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 bg-mystery-700 text-mystery-200 rounded-lg hover:bg-mystery-600 transition-colors accessibility-focus"
+            >
+              <SafeIcon icon={FiLogOut} className="text-lg" />
+              Logout
+            </button>
+          </div>
+
           <h1 className="text-6xl font-serif font-bold text-gold-400 mb-4 text-glow">
             The Vanishing Curator
           </h1>
@@ -388,37 +421,8 @@ export default function StartScreen() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.6 }}
-          className="text-center mt-12 text-mystery-400 text-sm space-y-2"
         >
-          <p>Best experienced with headphones • Suitable for ages 12+ • Auto-save enabled</p>
-          <div className="text-xs space-x-2">
-            <a 
-              href="https://app.getterms.io/view/HxaaZ/acceptable-use/en-us" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-mystery-500 hover:text-mystery-300 transition-colors"
-            >
-              Acceptable Use Policy
-            </a>
-            <span className="text-mystery-600">•</span>
-            <a 
-              href="https://app.getterms.io/view/HxaaZ/app-privacy/en-us" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-mystery-500 hover:text-mystery-300 transition-colors"
-            >
-              APP Privacy Policy
-            </a>
-            <span className="text-mystery-600">•</span>
-            <a 
-              href="https://app.getterms.io/view/HxaaZ/terms-of-service/en-us" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-mystery-500 hover:text-mystery-300 transition-colors"
-            >
-              Terms and Services Policy
-            </a>
-          </div>
+          <PolicyFooter />
         </motion.div>
       </div>
     </div>
