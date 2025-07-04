@@ -22,7 +22,8 @@ const initialState = {
     totalPuzzles: 0
   },
   teamId: null,
-  isOnline: false
+  isOnline: false,
+  lastSaved: null
 };
 
 function gameReducer(state, action) {
@@ -46,7 +47,8 @@ function gameReducer(state, action) {
       return {
         ...state,
         gameState: 'playing',
-        startTime: Date.now()
+        startTime: Date.now(),
+        lastSaved: Date.now()
       };
 
     case 'COMPLETE_PUZZLE':
@@ -64,7 +66,8 @@ function gameReducer(state, action) {
         gameStats: {
           ...state.gameStats,
           puzzlesSolved: state.gameStats.puzzlesSolved + 1
-        }
+        },
+        lastSaved: Date.now()
       };
 
     case 'ADVANCE_STAGE':
@@ -72,13 +75,15 @@ function gameReducer(state, action) {
       return {
         ...state,
         currentStage: state.currentStage + 1,
-        completedStages: newCompletedStages
+        completedStages: newCompletedStages,
+        lastSaved: Date.now()
       };
 
     case 'GO_TO_STAGE':
       return {
         ...state,
-        currentStage: action.payload.stageIndex
+        currentStage: action.payload.stageIndex,
+        lastSaved: Date.now()
       };
 
     case 'USE_HINT':
@@ -88,7 +93,8 @@ function gameReducer(state, action) {
         gameStats: {
           ...state.gameStats,
           hintsUsed: state.gameStats.hintsUsed + 1
-        }
+        },
+        lastSaved: Date.now()
       };
 
     case 'RECORD_INCORRECT_ATTEMPT':
@@ -99,19 +105,22 @@ function gameReducer(state, action) {
         incorrectAttempts: {
           ...state.incorrectAttempts,
           [stageKey]: currentAttempts + 1
-        }
+        },
+        lastSaved: Date.now()
       };
 
     case 'PAUSE_GAME':
       return {
         ...state,
-        gameState: 'paused'
+        gameState: 'paused',
+        lastSaved: Date.now()
       };
 
     case 'RESUME_GAME':
       return {
         ...state,
-        gameState: 'playing'
+        gameState: 'playing',
+        lastSaved: Date.now()
       };
 
     case 'COMPLETE_GAME':
@@ -121,19 +130,33 @@ function gameReducer(state, action) {
         gameStats: {
           ...state.gameStats,
           totalTime: Date.now() - state.startTime
-        }
+        },
+        lastSaved: Date.now()
       };
 
     case 'LOAD_SAVED_GAME':
       return {
         ...state,
-        ...action.payload
+        ...action.payload,
+        gameState: 'playing',
+        lastSaved: Date.now()
       };
 
     case 'SYNC_FROM_DATABASE':
       return {
         ...state,
-        ...action.payload
+        ...action.payload,
+        lastSaved: Date.now()
+      };
+
+    case 'UPDATE_STATS':
+      return {
+        ...state,
+        gameStats: {
+          ...state.gameStats,
+          totalTime: state.startTime ? Date.now() - state.startTime : 0
+        },
+        lastSaved: Date.now()
       };
 
     default:
@@ -175,9 +198,9 @@ export function GameProvider({ children }) {
     return () => clearInterval(interval);
   }, [state]);
 
-  // Local storage fallback
+  // Local storage auto-save
   useEffect(() => {
-    if (state.gameState === 'playing') {
+    if (state.gameState === 'playing' || state.gameState === 'paused') {
       const saveData = {
         ...state,
         lastSaved: Date.now()
@@ -185,6 +208,16 @@ export function GameProvider({ children }) {
       localStorage.setItem('escaperoomSave', JSON.stringify(saveData));
     }
   }, [state]);
+
+  // Update game stats periodically
+  useEffect(() => {
+    if (state.gameState === 'playing' && state.startTime) {
+      const interval = setInterval(() => {
+        dispatch({ type: 'UPDATE_STATS' });
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [state.gameState, state.startTime]);
 
   // Load saved game on mount
   useEffect(() => {
@@ -194,8 +227,11 @@ export function GameProvider({ children }) {
       if (savedGame) {
         try {
           const parsedSave = JSON.parse(savedGame);
-          // Only load if save is less than 24 hours old
-          if (Date.now() - parsedSave.lastSaved < 24 * 60 * 60 * 1000) {
+          // Only auto-load if save is less than 1 hour old and user was playing
+          if (
+            Date.now() - parsedSave.lastSaved < 60 * 60 * 1000 &&
+            parsedSave.gameState === 'playing'
+          ) {
             dispatch({ type: 'LOAD_SAVED_GAME', payload: parsedSave });
           }
         } catch (error) {
@@ -221,7 +257,7 @@ export function GameProvider({ children }) {
       };
 
       const team = await dbHelpers.createTeam(teamData);
-      
+
       // Create initial game session
       await dbHelpers.createGameSession({
         team_id: team.id,
@@ -242,6 +278,28 @@ export function GameProvider({ children }) {
       dispatch({ type: 'SET_TEAM_INFO', payload: teamInfo });
       dispatch({ type: 'START_GAME' });
       return null;
+    }
+  };
+
+  // Load saved game
+  const loadSavedGame = async (savedGameData) => {
+    try {
+      dispatch({ type: 'LOAD_SAVED_GAME', payload: savedGameData });
+      return true;
+    } catch (error) {
+      console.error('Failed to load saved game:', error);
+      return false;
+    }
+  };
+
+  // Delete saved game
+  const deleteSavedGame = () => {
+    try {
+      localStorage.removeItem('escaperoomSave');
+      return true;
+    } catch (error) {
+      console.error('Failed to delete saved game:', error);
+      return false;
     }
   };
 
@@ -269,10 +327,13 @@ export function GameProvider({ children }) {
     gameData,
     currentStageData: gameData.stages[state.currentStage],
     startGameWithDatabase,
+    loadSavedGame,
+    deleteSavedGame,
     recordPuzzleAttemptInDB,
     canAdvance: () => {
       const currentStageData = gameData.stages[state.currentStage];
       if (!currentStageData) return false;
+      
       return currentStageData.puzzles.every(puzzle => {
         const puzzleKey = `${state.currentStage}-${puzzle.id}`;
         return state.puzzleStates[puzzleKey]?.completed || false;
@@ -287,11 +348,7 @@ export function GameProvider({ children }) {
       return state.puzzleStates[key]?.completed || false;
     },
     getAvailableHints: () => {
-      const difficultyHints = {
-        easy: 5,
-        medium: 3,
-        hard: 1
-      };
+      const difficultyHints = { easy: 5, medium: 3, hard: 1 };
       return difficultyHints[state.difficulty] - state.hintsUsed;
     }
   };

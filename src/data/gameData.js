@@ -2,28 +2,25 @@ export const gameData = {
   title: "The Vanishing Curator",
   description: "A 60-minute interactive investigation experience",
   totalStages: 6,
-  
   stages: [
     {
       id: 0,
       title: "The Locked Office",
       description: "Dr. Eleanor Blackwood's office holds the first clues",
       narrative: {
-        text: `You slowly open the heavy door to Dr. Eleanor Blackwood's office. The room is dim. A tiny desk lamp flickers, casting long shadows across papers, books, and strange museum objects. Something feels... off. It looks like she left in the middle of her work — but never came back.
+        text: `You slowly open the heavy door to Dr. Eleanor Blackwood's office. The room is dim. A tiny desk lamp flickers, casting long shadows across papers, books, and strange museum objects. Something feels... off.
 
-On the desk is her open journal. The last page reads:
-"I don't trust them. The man with the silver pin came again, asking about the Altamira sketches. He knows too much. I'm not safe."
+It looks like she left in the middle of her work — but never came back. On the desk is her open journal. The last page reads: "I don't trust them. The man with the silver pin came again, asking about the Altamira sketches. He knows too much. I'm not safe."
 
-Next to the journal is her tablet. A glowing message appears:
-"Unsent draft — 'They're hiding something. If I disappear, the answer is in the drawer under the desk. Use the calendar. Trust no one.'"
+Next to the journal is her tablet. A glowing message appears: "Unsent draft — 'They're hiding something. If I disappear, the answer is in the drawer under the desk. Use the calendar. Trust no one.'"
 
-You glance at the calendar on the wall. Some dates are circled in red. Others are crossed out.
+You glance at the calendar on the wall. Some dates are circled in red. Others are crossed out. A small flashing light blinks on her voicemail machine. You press play.
 
-A small flashing light blinks on her voicemail machine. You press play. Her voice is shaky:
-"I think someone broke in last night. If you find this… look at the bookshelf. Left side. The blue book. Inside is—static—don't let the board erase the truth…"
+Her voice is shaky: "I think someone broke in last night. If you find this… look at the bookshelf. Left side. The blue book. Inside is—static—don't let the board erase the truth…"
 
 The room holds secrets, and the clues are here — if you can put them together before time runs out.`,
         audio: "/audio/stage1-intro.mp3",
+        video: "/video/stage1-intro.mp4",
         image: "/images/office-scene.jpg"
       },
       puzzles: [
@@ -98,22 +95,23 @@ The room holds secrets, and the clues are here — if you can put them together 
       title: "Digital Forensics Lab",
       description: "Investigate the digital evidence",
       narrative: {
-        text: `You enter the quiet server room. Everything is buzzing — lights blinking, computers humming. There's a chair knocked over, and someone left their lunch half-eaten. On the desk, a computer screen glows with a strange folder labeled: "Blackwood Inquiry."
+        text: `You enter the quiet server room. Everything is buzzing — lights blinking, computers humming. There's a chair knocked over, and someone left their lunch half-eaten.
 
-Inside the folder are messages between Dr. Blackwood and someone called "Curator X."
+On the desk, a computer screen glows with a strange folder labeled: "Blackwood Inquiry." Inside the folder are messages between Dr. Blackwood and someone called "Curator X."
 
 Curator X: "Stop asking questions. You've already been flagged. Delete everything and walk away."
+
 Dr. Blackwood: "No. I found forged image files and fake metadata. This goes beyond our museum."
 
 There are photo files with different dates than what's shown in the gallery. Some even come from outside the country. One file shows an IP address from Zurich — why would art from New York be uploaded from Europe?
 
-Next to the keyboard is a sticky note:
-"Hidden in plain sight. Play the audio. The real clue isn't what you hear — it's what you see."
+Next to the keyboard is a sticky note: "Hidden in plain sight. Play the audio. The real clue isn't what you hear — it's what you see."
 
-You click play on an audio file. It's a soft melody — but strange symbols appear on the screen as the music plays. A spectrogram?
+You click play on an audio file. It's a soft melody — but strange symbols appear on the screen as the music plays. A spectrogram? Something's being hidden in the files.
 
-Something's being hidden in the files. Someone has been changing data. But why?`,
+Someone has been changing data. But why?`,
         audio: "/audio/stage2-intro.mp3",
+        video: "/video/stage2-intro.mp4",
         image: "/images/forensics-lab.jpg"
       },
       puzzles: [
@@ -190,9 +188,24 @@ Something's being hidden in the files. Someone has been changing data. But why?`
           ],
           data: {
             logs: [
-              { time: "03:47 AM", ip: "192.168.1.45", action: "File Access", user: "Unknown" },
-              { time: "09:15 AM", ip: "192.168.1.23", action: "Login", user: "E.Blackwood" },
-              { time: "10:30 AM", ip: "192.168.1.24", action: "Login", user: "Staff" }
+              {
+                time: "03:47 AM",
+                ip: "192.168.1.45",
+                action: "File Access",
+                user: "Unknown"
+              },
+              {
+                time: "09:15 AM",
+                ip: "192.168.1.23",
+                action: "Login",
+                user: "E.Blackwood"
+              },
+              {
+                time: "10:30 AM",
+                ip: "192.168.1.24",
+                action: "Login",
+                user: "Staff"
+              }
             ]
           }
         }
@@ -212,25 +225,21 @@ Something's being hidden in the files. Someone has been changing data. But why?`
       narrative: {
         text: `You ride the old elevator down, past the main floors, until you reach the basement. The door creaks open. It's cold and quiet. Long rows of filing cabinets stretch into the dark, each labeled in dusty black letters: ARCHIVE.
 
-You find one cabinet with a red sticker: Confidential — Board Access Only.
+You find one cabinet with a red sticker: Confidential — Board Access Only. Inside are files marked "Forgery Watch List" and "Project Etruscan Echo."
 
-Inside are files marked "Forgery Watch List" and "Project Etruscan Echo." One folder is filled with angry letters between Dr. Blackwood and museum leaders.
-
-"I won't be silent. The forged sculpture came from inside our board. I have proof, and it's in the ancient ledger."
+One folder is filled with angry letters between Dr. Blackwood and museum leaders. "I won't be silent. The forged sculpture came from inside our board. I have proof, and it's in the ancient ledger."
 
 A fragile scroll falls out from the folder. It's written in three languages — but something's off. Some words are clearly wrong. Fake.
 
-You also find a printed email:
-"Get rid of the old cipher records. If she decodes them, everything falls apart."
+You also find a printed email: "Get rid of the old cipher records. If she decodes them, everything falls apart."
 
-On the back of the scroll, someone scribbled:
-"The truth is hidden in the code. It's not what it says — it's what it means."
+On the back of the scroll, someone scribbled: "The truth is hidden in the code. It's not what it says — it's what it means."
 
-There's a lock on the final drawer. Above it, a riddle scratched into the wood:
-"What speaks no words but tells every lie?"
+There's a lock on the final drawer. Above it, a riddle scratched into the wood: "What speaks no words but tells every lie?"
 
 The deeper you dig, the more dangerous the truth becomes…`,
         audio: "/audio/stage3-intro.mp3",
+        video: "/video/stage3-intro.mp4",
         image: "/images/archives.jpg"
       },
       puzzles: [
@@ -248,11 +257,31 @@ The deeper you dig, the more dangerous the truth becomes…`,
           ],
           data: {
             documents: [
-              { id: "A", authentic: true, clues: ["Correct historical references", "Proper aging"] },
-              { id: "B", authentic: false, clues: ["Modern ink", "Wrong date format"] },
-              { id: "C", authentic: true, clues: ["Period-appropriate language", "Correct seal"] },
-              { id: "D", authentic: false, clues: ["Anachronistic terms", "Fresh paper"] },
-              { id: "E", authentic: true, clues: ["Proper provenance", "Correct materials"] }
+              {
+                id: "A",
+                authentic: true,
+                clues: ["Correct historical references", "Proper aging"]
+              },
+              {
+                id: "B",
+                authentic: false,
+                clues: ["Modern ink", "Wrong date format"]
+              },
+              {
+                id: "C",
+                authentic: true,
+                clues: ["Period-appropriate language", "Correct seal"]
+              },
+              {
+                id: "D",
+                authentic: false,
+                clues: ["Anachronistic terms", "Fresh paper"]
+              },
+              {
+                id: "E",
+                authentic: true,
+                clues: ["Proper provenance", "Correct materials"]
+              }
             ]
           }
         },
@@ -271,8 +300,16 @@ The deeper you dig, the more dangerous the truth becomes…`,
           data: {
             database: {
               entries: [
-                { title: "Project Etruscan Echo", authentic: false, keywords: ["project", "etruscan", "forgery"] },
-                { title: "Authentic Etruscan Vase", authentic: true, keywords: ["etruscan", "authentic", "verified"] }
+                {
+                  title: "Project Etruscan Echo",
+                  authentic: false,
+                  keywords: ["project", "etruscan", "forgery"]
+                },
+                {
+                  title: "Authentic Etruscan Vase",
+                  authentic: true,
+                  keywords: ["etruscan", "authentic", "verified"]
+                }
               ]
             }
           }
@@ -314,8 +351,7 @@ The deeper you dig, the more dangerous the truth becomes…`,
       narrative: {
         text: `The control room is dark, lit only by the glow of monitors. Some screens show museum hallways. Others are black with the words: "Footage Missing."
 
-You find a sticky note taped to the monitor:
-"Check 4:07 AM — something's off."
+You find a sticky note taped to the monitor: "Check 4:07 AM — something's off."
 
 You fast-forward the tape. There! A shadowy figure walks with Dr. Blackwood near the east wing. But suddenly, the video cuts out. It skips forward several minutes. Where did they go?
 
@@ -327,6 +363,7 @@ And on Camera 6, you catch a blurry person holding something shiny. Maybe a key?
 
 Someone is covering their tracks. But if you can follow the movement trail, match the badge logs, and find out who erased the video, you'll be one step closer to the truth.`,
         audio: "/audio/stage4-intro.mp3",
+        video: "/video/stage4-intro.mp4",
         image: "/images/security-room.jpg"
       },
       puzzles: [
@@ -344,10 +381,26 @@ Someone is covering their tracks. But if you can follow the movement trail, matc
           ],
           data: {
             footage: [
-              { camera: "Cam1", time: "4:07 AM", event: "Dr. Blackwood enters east wing" },
-              { camera: "Cam2", time: "4:15 AM", event: "Footage corrupted" },
-              { camera: "Cam3", time: "4:23 AM", event: "Figure exits building" },
-              { camera: "Cam4", time: "4:30 AM", event: "Motion detected in parking lot" }
+              {
+                camera: "Cam1",
+                time: "4:07 AM",
+                event: "Dr. Blackwood enters east wing"
+              },
+              {
+                camera: "Cam2",
+                time: "4:15 AM",
+                event: "Footage corrupted"
+              },
+              {
+                camera: "Cam3",
+                time: "4:23 AM",
+                event: "Figure exits building"
+              },
+              {
+                camera: "Cam4",
+                time: "4:30 AM",
+                event: "Motion detected in parking lot"
+              }
             ]
           }
         },
@@ -365,8 +418,18 @@ Someone is covering their tracks. But if you can follow the movement trail, matc
           ],
           data: {
             badgeLog: [
-              { badge: "M.Sterling", time: "4:10 AM", location: "Archives", status: "Owner not scheduled" },
-              { badge: "E.Blackwood", time: "4:07 AM", location: "East Wing", status: "Badge reported missing" }
+              {
+                badge: "M.Sterling",
+                time: "4:10 AM",
+                location: "Archives",
+                status: "Owner not scheduled"
+              },
+              {
+                badge: "E.Blackwood",
+                time: "4:07 AM",
+                location: "East Wing",
+                status: "Badge reported missing"
+              }
             ]
           }
         },
@@ -384,9 +447,21 @@ Someone is covering their tracks. But if you can follow the movement trail, matc
           ],
           data: {
             motionSensors: [
-              { sensor: "S1", location: "East Wing", time: "4:07 AM" },
-              { sensor: "S2", location: "Corridor A", time: "4:09 AM" },
-              { sensor: "S3", location: "Exhibition Hall", time: "4:12 AM" }
+              {
+                sensor: "S1",
+                location: "East Wing",
+                time: "4:07 AM"
+              },
+              {
+                sensor: "S2",
+                location: "Corridor A",
+                time: "4:09 AM"
+              },
+              {
+                sensor: "S3",
+                location: "Exhibition Hall",
+                time: "4:12 AM"
+              }
             ]
           }
         }
@@ -408,11 +483,9 @@ Someone is covering their tracks. But if you can follow the movement trail, matc
 
 One painting says it's from 1890, but the label looks brand new. The colors are too bright. The signature looks strange.
 
-You hear a click — and behind a statue, you find a tiny audio recorder. Dr. Blackwood's voice plays:
-"These aren't real. The real paintings had duller colors and older brushstrokes. Someone replaced them. Look under the paint — the truth is there."
+You hear a click — and behind a statue, you find a tiny audio recorder. Dr. Blackwood's voice plays: "These aren't real. The real paintings had duller colors and older brushstrokes. Someone replaced them. Look under the paint — the truth is there."
 
-You grab a UV flashlight and shine it across the canvas. Words glow in purple light:
-"Sketch replaced. Board involved."
+You grab a UV flashlight and shine it across the canvas. Words glow in purple light: "Sketch replaced. Board involved."
 
 Next to a locked display case is a symbol — one you saw before in the secret archive files. Below it, the word: "Passage."
 
@@ -420,6 +493,7 @@ Is there a hidden door here? Did someone sneak the real artwork out through the 
 
 Dr. Blackwood found out too much. Now it's your turn to prove she was right — before this fake exhibit opens to the world.`,
         audio: "/audio/stage5-intro.mp3",
+        video: "/video/stage5-intro.mp4",
         image: "/images/exhibition-hall.jpg"
       },
       puzzles: [
@@ -437,13 +511,41 @@ Dr. Blackwood found out too much. Now it's your turn to prove she was right — 
           ],
           data: {
             paintings: [
-              { id: 1, authentic: true, clues: ["Correct period pigments", "Proper aging"] },
-              { id: 2, authentic: false, clues: ["Modern acrylic paint", "Too vibrant colors"] },
-              { id: 3, authentic: true, clues: ["Historical provenance", "Correct technique"] },
-              { id: 4, authentic: false, clues: ["Wrong signature style", "Anachronistic elements"] },
-              { id: 5, authentic: true, clues: ["Proper documentation", "Period materials"] },
-              { id: 6, authentic: true, clues: ["Correct brushwork", "Authentic wear"] },
-              { id: 7, authentic: false, clues: ["Modern canvas", "Incorrect frame style"] }
+              {
+                id: 1,
+                authentic: true,
+                clues: ["Correct period pigments", "Proper aging"]
+              },
+              {
+                id: 2,
+                authentic: false,
+                clues: ["Modern acrylic paint", "Too vibrant colors"]
+              },
+              {
+                id: 3,
+                authentic: true,
+                clues: ["Historical provenance", "Correct technique"]
+              },
+              {
+                id: 4,
+                authentic: false,
+                clues: ["Wrong signature style", "Anachronistic elements"]
+              },
+              {
+                id: 5,
+                authentic: true,
+                clues: ["Proper documentation", "Period materials"]
+              },
+              {
+                id: 6,
+                authentic: true,
+                clues: ["Correct brushwork", "Authentic wear"]
+              },
+              {
+                id: 7,
+                authentic: false,
+                clues: ["Modern canvas", "Incorrect frame style"]
+              }
             ]
           }
         },
@@ -461,10 +563,22 @@ Dr. Blackwood found out too much. Now it's your turn to prove she was right — 
           ],
           data: {
             uvMessages: [
-              { location: "Painting A", text: "BOARD" },
-              { location: "Sculpture B", text: "ORCHESTRATED" },
-              { location: "Painting C", text: "FORGERY" },
-              { location: "Display D", text: "SCHEME" }
+              {
+                location: "Painting A",
+                text: "BOARD"
+              },
+              {
+                location: "Sculpture B",
+                text: "ORCHESTRATED"
+              },
+              {
+                location: "Painting C",
+                text: "FORGERY"
+              },
+              {
+                location: "Display D",
+                text: "SCHEME"
+              }
             ]
           }
         },
@@ -482,7 +596,12 @@ Dr. Blackwood found out too much. Now it's your turn to prove she was right — 
           ],
           data: {
             symbols: ["⚡", "🔺", "⭐", "🔷"],
-            mapping: { "⚡": 7, "🔺": 8, "⭐": 3, "🔷": 4 }
+            mapping: {
+              "⚡": 7,
+              "🔺": 8,
+              "⭐": 3,
+              "🔷": 4
+            }
           }
         }
       ],
@@ -503,8 +622,7 @@ Dr. Blackwood found out too much. Now it's your turn to prove she was right — 
 
 Inside, a board covered in photos shows how it all connects: museum leaders, forged artwork, deleted footage, and one name circled in red.
 
-You find Dr. Blackwood's laptop still open. Her final message plays:
-"They tried to silence me. But I've left everything. The emails, the scans, even the real travel records from Madrid. Use what I found. Solve the mystery. Finish what I started."
+You find Dr. Blackwood's laptop still open. Her final message plays: "They tried to silence me. But I've left everything. The emails, the scans, even the real travel records from Madrid. Use what I found. Solve the mystery. Finish what I started."
 
 The lights dim. You hear footsteps echo in the hallway. Time is running out.
 
@@ -515,6 +633,7 @@ You must now:
 
 You've come so far. Now, it's the final moment. Will you expose the truth and save the curator — or let the mystery disappear forever?`,
         audio: "/audio/stage6-intro.mp3",
+        video: "/video/stage6-intro.mp4",
         image: "/images/final-confrontation.jpg"
       },
       puzzles: [
@@ -532,10 +651,22 @@ You've come so far. Now, it's the final moment. Will you expose the truth and sa
           ],
           data: {
             evidence: [
-              { type: "Email", connects: ["Marcus Sterling", "Director Hamilton"] },
-              { type: "Badge Log", connects: ["Marcus Sterling", "Archives"] },
-              { type: "Financial Records", connects: ["Director Hamilton", "Zurich Bank"] },
-              { type: "Board Minutes", connects: ["Director Hamilton", "Project Etruscan"] }
+              {
+                type: "Email",
+                connects: ["Marcus Sterling", "Director Hamilton"]
+              },
+              {
+                type: "Badge Log",
+                connects: ["Marcus Sterling", "Archives"]
+              },
+              {
+                type: "Financial Records",
+                connects: ["Director Hamilton", "Zurich Bank"]
+              },
+              {
+                type: "Board Minutes",
+                connects: ["Director Hamilton", "Project Etruscan"]
+              }
             ]
           }
         },
@@ -553,9 +684,18 @@ You've come so far. Now, it's the final moment. Will you expose the truth and sa
           ],
           data: {
             motives: [
-              { person: "Marcus Sterling", motive: "Blackmail victim" },
-              { person: "Director Hamilton", motive: "Financial gain from insurance fraud" },
-              { person: "Board Member X", motive: "Reputation protection" }
+              {
+                person: "Marcus Sterling",
+                motive: "Blackmail victim"
+              },
+              {
+                person: "Director Hamilton",
+                motive: "Financial gain from insurance fraud"
+              },
+              {
+                person: "Board Member X",
+                motive: "Reputation protection"
+              }
             ]
           }
         },
@@ -572,10 +712,21 @@ You've come so far. Now, it's the final moment. Will you expose the truth and sa
             "Look for off-site storage facilities"
           ],
           data: {
-            coordinates: { lat: 40.7128, lng: -74.0060 },
+            coordinates: {
+              lat: 40.7128,
+              lng: -74.0060
+            },
             properties: [
-              { name: "Storage Warehouse 7", lat: 40.7128, lng: -74.0060 },
-              { name: "Main Museum", lat: 40.7614, lng: -73.9776 }
+              {
+                name: "Storage Warehouse 7",
+                lat: 40.7128,
+                lng: -74.0060
+              },
+              {
+                name: "Main Museum",
+                lat: 40.7614,
+                lng: -73.9776
+              }
             ]
           }
         }
@@ -585,26 +736,35 @@ You've come so far. Now, it's the final moment. Will you expose the truth and sa
           type: "full-success",
           title: "Perfect Resolution",
           description: "You exposed the forgery ring and rescued Dr. Blackwood!",
-          requirements: ["All puzzles solved", "Under 50 minutes", "Less than 3 hints used"]
+          requirements: [
+            "All puzzles solved",
+            "Under 50 minutes",
+            "Less than 3 hints used"
+          ]
         },
         {
           type: "partial-success",
           title: "Truth Revealed",
           description: "You solved the mystery but couldn't save Dr. Blackwood in time.",
-          requirements: ["All puzzles solved", "Over 50 minutes"]
+          requirements: [
+            "All puzzles solved",
+            "Over 50 minutes"
+          ]
         },
         {
           type: "minimal-success",
           title: "Narrow Escape",
           description: "You escaped with some evidence but the case remains open.",
-          requirements: ["Most puzzles solved", "Used maximum hints"]
+          requirements: [
+            "Most puzzles solved",
+            "Used maximum hints"
+          ]
         }
       ],
       timeLimit: 900,
       musicTrack: "tension-confrontation"
     }
   ],
-  
   settings: {
     difficulties: {
       easy: {

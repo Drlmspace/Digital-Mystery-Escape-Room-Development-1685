@@ -3,11 +3,12 @@ import { motion } from 'framer-motion';
 import SafeIcon from '../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
-const { FiPlay, FiPause, FiImage, FiFileText } = FiIcons;
+const { FiPlay, FiPause, FiImage, FiFileText, FiVideo } = FiIcons;
 
 export default function NarrativeSection({ narrative, stageTitle }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showImage, setShowImage] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
 
   const toggleAudio = () => {
     setIsPlaying(!isPlaying);
@@ -24,7 +25,6 @@ export default function NarrativeSection({ narrative, stageTitle }) {
         <h2 className="text-3xl font-serif font-bold text-gold-400">
           {stageTitle}
         </h2>
-        
         <div className="flex items-center gap-3">
           {narrative.audio && (
             <button
@@ -38,7 +38,18 @@ export default function NarrativeSection({ narrative, stageTitle }) {
               </span>
             </button>
           )}
-          
+          {narrative.video && (
+            <button
+              onClick={() => setShowVideo(!showVideo)}
+              className="flex items-center gap-2 px-4 py-2 bg-mystery-700 text-mystery-200 rounded-lg hover:bg-mystery-600 transition-colors accessibility-focus"
+              aria-label={showVideo ? 'Hide video' : 'Show video'}
+            >
+              <SafeIcon icon={FiVideo} className="text-lg" />
+              <span className="text-sm">
+                {showVideo ? 'Hide' : 'Show'} Video
+              </span>
+            </button>
+          )}
           {narrative.image && (
             <button
               onClick={() => setShowImage(!showImage)}
@@ -53,6 +64,27 @@ export default function NarrativeSection({ narrative, stageTitle }) {
           )}
         </div>
       </div>
+
+      {/* Video Player */}
+      {showVideo && narrative.video && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+          className="mb-6"
+        >
+          <video
+            src={narrative.video}
+            controls
+            className="w-full h-64 object-cover rounded-lg"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          >
+            Your browser does not support the video tag.
+          </video>
+        </motion.div>
+      )}
 
       {/* Scene Image */}
       {showImage && narrative.image && (
@@ -94,7 +126,7 @@ export default function NarrativeSection({ narrative, stageTitle }) {
                 Audio narration available for this section
               </p>
               <div className="mt-2 h-1 bg-mystery-700 rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-gold-400 transition-all duration-1000"
                   style={{ width: isPlaying ? '100%' : '0%' }}
                 />
@@ -110,6 +142,9 @@ export default function NarrativeSection({ narrative, stageTitle }) {
         <p>{narrative.text}</p>
         {narrative.audio && (
           <p>Audio narration is available for this section.</p>
+        )}
+        {narrative.video && (
+          <p>Video content is available for this section.</p>
         )}
       </div>
     </motion.div>
