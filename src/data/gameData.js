@@ -8,17 +8,23 @@ export const gameData = {
       title: "The Locked Office",
       description: "Dr. Eleanor Blackwood's office holds the first clues",
       narrative: {
-        text: `You slowly open the heavy door to Dr. Eleanor Blackwood's office. The room is dim. A tiny desk lamp flickers, casting long shadows across papers, books, and strange museum objects. Something feels... off.
+        text: `Dr. Eleanor Blackwood's office feels frozen in time. Her coat hangs over the leather chair, cold coffee sits on the windowsill, and her favorite pen rests uncapped beside an open journal. But she's gone—vanished without a trace after investigating suspicious artifact acquisitions that put her at odds with the museum's board.
 
-It looks like she left in the middle of her work — but never came back. On the desk is her open journal. The last page reads: "I don't trust them. The man with the silver pin came again, asking about the Altamira sketches. He knows too much. I'm not safe."
+The office holds no signs of struggle, yet something feels wrong. Her wall calendar shows repeated Thursday meetings marked only "A.B." with times scribbled beside them. Several dates are circled in red ink, the pen strokes pressed deep into the paper.
 
-Next to the journal is her tablet. A glowing message appears: "Unsent draft — 'They're hiding something. If I disappear, the answer is in the drawer under the desk. Use the calendar. Trust no one.'"
+Her journal lies open to a cryptic entry:
+"They want the Altamira sketches. The board's hiding something. I left proof in plain sight—but only someone looking through the message will find it."
 
-You glance at the calendar on the wall. Some dates are circled in red. Others are crossed out. A small flashing light blinks on her voicemail machine. You press play.
+A voice recorder on the desk blinks red. You press play, and her voice crackles through static:
+"If you're hearing this... I didn't run. I've encoded everything. Don't just listen. The numbers are hidden in the static itself. Listen carefully to the tonal changes—they're not random."
 
-Her voice is shaky: "I think someone broke in last night. If you find this… look at the bookshelf. Left side. The blue book. Inside is—static—don't let the board erase the truth…"
+The message dissolves into white noise, but within the static, you can hear subtle shifts in pitch and tone, almost like a pattern.
 
-The room holds secrets, and the clues are here — if you can put them together before time runs out.`,
+Above the desk, a computer printout shows a sound spectrogram—jagged lines and peaks across a grid. A sticky note reads: "Same time. Every Thursday. What's the pattern?"
+
+Her computer screen displays the digital calendar, showing months of recurring Thursday appointments labeled "A.B." The locked desk drawer sits tantalizingly close, its combination lock waiting for the right sequence of numbers.
+
+Eleanor knew she was in danger. She left you the trail—now you must follow it.`,
         audio: "/audio/stage1-intro.mp3",
         video: "/video/stage1-intro.mp4",
         image: "/images/office-scene.jpg"
@@ -61,7 +67,8 @@ The room holds secrets, and the clues are here — if you can put them together 
           ],
           data: {
             audioFile: "/audio/voice-message.mp3",
-            spectrogram: "/images/spectrogram.png"
+            spectrogram: "/images/spectrogram.png",
+            stageAudioKey: "stage1Intro" // Links to admin uploaded stage1Intro
           }
         },
         {
@@ -95,12 +102,11 @@ The room holds secrets, and the clues are here — if you can put them together 
       title: "Digital Forensics Lab",
       description: "Investigate the digital evidence",
       narrative: {
-        text: `You enter the quiet server room. Everything is buzzing — lights blinking, computers humming. There's a chair knocked over, and someone left their lunch half-eaten.
+        text: `You enter the quiet server room. Everything is buzzing — lights blinking, computers humming. There's a chair knocked over, and someone left their lunch half-eaten. On the desk, a computer screen glows with a strange folder labeled: "Blackwood Inquiry."
 
-On the desk, a computer screen glows with a strange folder labeled: "Blackwood Inquiry." Inside the folder are messages between Dr. Blackwood and someone called "Curator X."
+Inside the folder are messages between Dr. Blackwood and someone called "Curator X."
 
 Curator X: "Stop asking questions. You've already been flagged. Delete everything and walk away."
-
 Dr. Blackwood: "No. I found forged image files and fake metadata. This goes beyond our museum."
 
 There are photo files with different dates than what's shown in the gallery. Some even come from outside the country. One file shows an IP address from Zurich — why would art from New York be uploaded from Europe?

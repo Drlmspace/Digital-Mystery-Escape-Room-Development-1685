@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useAudio } from '../../contexts/AudioContext';
+import { useGame } from '../../contexts/GameContext';
 import SafeIcon from '../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
@@ -9,10 +11,47 @@ export default function NarrativeSection({ narrative, stageTitle }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showImage, setShowImage] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
+  const { audioMessages, playAudioMessage } = useAudio();
+  const { currentStage } = useGame();
+  const [stageAudioUrl, setStageAudioUrl] = useState(null);
+
+  // Map current stage to audio message key
+  const getStageAudioKey = () => {
+    const stageAudioKeys = {
+      0: 'stage1Intro',
+      1: 'stage2Intro', 
+      2: 'stage3Intro',
+      3: 'stage4Intro',
+      4: 'stage5Intro',
+      5: 'stage6Intro'
+    };
+    return stageAudioKeys[currentStage] || null;
+  };
+
+  useEffect(() => {
+    // Get the stage-specific audio URL from admin uploaded content
+    const audioKey = getStageAudioKey();
+    if (audioKey && audioMessages[audioKey]) {
+      setStageAudioUrl(audioMessages[audioKey]);
+    }
+  }, [currentStage, audioMessages]);
 
   const toggleAudio = () => {
-    setIsPlaying(!isPlaying);
-    // Audio implementation would go here
+    const audioKey = getStageAudioKey();
+    if (audioKey && audioMessages[audioKey]) {
+      if (isPlaying) {
+        setIsPlaying(false);
+        // Stop audio playback
+      } else {
+        setIsPlaying(true);
+        playAudioMessage(audioKey);
+        
+        // Auto-stop after reasonable time (adjust based on your audio length)
+        setTimeout(() => {
+          setIsPlaying(false);
+        }, 60000); // 1 minute for stage narrations
+      }
+    }
   };
 
   return (
@@ -26,7 +65,21 @@ export default function NarrativeSection({ narrative, stageTitle }) {
           {stageTitle}
         </h2>
         <div className="flex items-center gap-3">
-          {narrative.audio && (
+          {/* Stage Narration Audio */}
+          {stageAudioUrl && (
+            <button
+              onClick={toggleAudio}
+              className="flex items-center gap-2 px-4 py-2 bg-mystery-700 text-mystery-200 rounded-lg hover:bg-mystery-600 transition-colors accessibility-focus"
+              aria-label={isPlaying ? 'Pause stage narration' : 'Play stage narration'}
+            >
+              <SafeIcon icon={isPlaying ? FiPause : FiPlay} className="text-lg" />
+              <span className="text-sm">
+                {isPlaying ? 'Pause' : 'Play'} Stage Narration
+              </span>
+            </button>
+          )}
+
+          {narrative.audio && !stageAudioUrl && (
             <button
               onClick={toggleAudio}
               className="flex items-center gap-2 px-4 py-2 bg-mystery-700 text-mystery-200 rounded-lg hover:bg-mystery-600 transition-colors accessibility-focus"
@@ -38,6 +91,7 @@ export default function NarrativeSection({ narrative, stageTitle }) {
               </span>
             </button>
           )}
+
           {narrative.video && (
             <button
               onClick={() => setShowVideo(!showVideo)}
@@ -50,6 +104,7 @@ export default function NarrativeSection({ narrative, stageTitle }) {
               </span>
             </button>
           )}
+
           {narrative.image && (
             <button
               onClick={() => setShowImage(!showImage)}
@@ -64,6 +119,15 @@ export default function NarrativeSection({ narrative, stageTitle }) {
           )}
         </div>
       </div>
+
+      {/* Admin Audio Notice */}
+      {stageAudioUrl && (
+        <div className="mb-4 p-3 bg-gold-500/20 border border-gold-400 rounded-lg">
+          <p className="text-gold-400 text-sm text-center">
+            🎧 Custom stage narration loaded from admin dashboard
+          </p>
+        </div>
+      )}
 
       {/* Video Player */}
       {showVideo && narrative.video && (
@@ -117,16 +181,16 @@ export default function NarrativeSection({ narrative, stageTitle }) {
       </div>
 
       {/* Audio Controls */}
-      {narrative.audio && (
+      {(stageAudioUrl || narrative.audio) && (
         <div className="mt-6 p-4 bg-mystery-800 rounded-lg">
           <div className="flex items-center gap-4">
             <SafeIcon icon={FiFileText} className="text-gold-400 text-xl" />
             <div className="flex-1">
               <p className="text-mystery-200 text-sm">
-                Audio narration available for this section
+                {stageAudioUrl ? 'Custom stage narration available (uploaded via admin)' : 'Audio narration available for this section'}
               </p>
               <div className="mt-2 h-1 bg-mystery-700 rounded-full overflow-hidden">
-                <div
+                <div 
                   className="h-full bg-gold-400 transition-all duration-1000"
                   style={{ width: isPlaying ? '100%' : '0%' }}
                 />
@@ -140,7 +204,7 @@ export default function NarrativeSection({ narrative, stageTitle }) {
       <div className="screen-reader-only">
         <h3>Stage Narrative</h3>
         <p>{narrative.text}</p>
-        {narrative.audio && (
+        {(stageAudioUrl || narrative.audio) && (
           <p>Audio narration is available for this section.</p>
         )}
         {narrative.video && (

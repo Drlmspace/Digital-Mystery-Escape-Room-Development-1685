@@ -1,20 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useAudio } from '../../../contexts/AudioContext';
 import SafeIcon from '../../../common/SafeIcon';
 import * as FiIcons from 'react-icons/fi';
 
 const { FiPlay, FiPause, FiVolume2 } = FiIcons;
 
-export default function AudioAnalysisPuzzle({ 
-  puzzle, 
-  onComplete, 
-  onIncorrectAttempt, 
-  isCompleted, 
-  showAnswer 
-}) {
+export default function AudioAnalysisPuzzle({ puzzle, onComplete, onIncorrectAttempt, isCompleted, showAnswer }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [userInput, setUserInput] = useState('');
   const [showSpectrogram, setShowSpectrogram] = useState(false);
+  const { audioMessages, playAudioMessage } = useAudio();
+  const [currentAudio, setCurrentAudio] = useState(null);
+
+  // Map stage-specific audio messages to puzzles
+  const getStageAudioKey = () => {
+    // Get current stage from puzzle context or URL
+    const currentPath = window.location.hash;
+    
+    if (currentPath.includes('stage') || puzzle.id === 'voice-cipher') {
+      // Stage 1 - Voice Message Cipher
+      return 'stage1Intro';
+    }
+    
+    // Default mapping based on puzzle ID or type
+    const audioMapping = {
+      'voice-cipher': 'stage1Intro',
+      'voice-message': 'voiceMessage', 
+      'dr-blackwood-recording': 'drBlackwoodRecording',
+      'curator-x-message': 'curatorXMessage',
+      'hidden-audio': 'stage2Intro',
+      'security-audio': 'stage4Intro',
+      'final-message': 'finalMessage'
+    };
+    
+    return audioMapping[puzzle.id] || 'voiceMessage';
+  };
+
+  useEffect(() => {
+    // Get the appropriate audio URL for this stage/puzzle
+    const audioKey = getStageAudioKey();
+    const audioUrl = audioMessages[audioKey];
+    
+    if (audioUrl) {
+      setCurrentAudio(audioUrl);
+    }
+  }, [audioMessages, puzzle.id]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -30,8 +61,22 @@ export default function AudioAnalysisPuzzle({
   };
 
   const toggleAudio = () => {
-    setIsPlaying(!isPlaying);
-    // Audio implementation would go here
+    if (currentAudio) {
+      if (isPlaying) {
+        // Pause audio
+        setIsPlaying(false);
+      } else {
+        // Play audio
+        const audioKey = getStageAudioKey();
+        playAudioMessage(audioKey);
+        setIsPlaying(true);
+        
+        // Auto-stop after reasonable time (adjust based on your audio length)
+        setTimeout(() => {
+          setIsPlaying(false);
+        }, 30000); // 30 seconds
+      }
+    }
   };
 
   if (isCompleted) {
@@ -57,12 +102,26 @@ export default function AudioAnalysisPuzzle({
         <div className="flex items-center justify-center mb-4">
           <button
             onClick={toggleAudio}
-            className="flex items-center gap-3 px-6 py-3 bg-gold-500 text-mystery-900 rounded-lg hover:bg-gold-600 transition-colors font-semibold accessibility-focus"
+            disabled={!currentAudio}
+            className={`flex items-center gap-3 px-6 py-3 rounded-lg transition-colors font-semibold accessibility-focus ${
+              currentAudio 
+                ? 'bg-gold-500 text-mystery-900 hover:bg-gold-600' 
+                : 'bg-mystery-600 text-mystery-400 cursor-not-allowed'
+            }`}
           >
             <SafeIcon icon={isPlaying ? FiPause : FiPlay} className="text-xl" />
             {isPlaying ? 'Pause' : 'Play'} Audio Message
           </button>
         </div>
+
+        {/* Audio Source Info */}
+        {currentAudio && (
+          <div className="text-center mb-4">
+            <p className="text-sm text-mystery-300">
+              🎧 Stage narration audio loaded from admin dashboard
+            </p>
+          </div>
+        )}
 
         {/* Audio Visualization */}
         <div className="h-20 bg-mystery-700 rounded-lg flex items-center justify-center mb-4">
@@ -70,11 +129,10 @@ export default function AudioAnalysisPuzzle({
             {[...Array(20)].map((_, i) => (
               <div
                 key={i}
-                className={`
-                  w-2 bg-gold-400 rounded-full transition-all duration-300
-                  ${isPlaying ? 'animate-pulse' : ''}
-                `}
-                style={{ 
+                className={`w-2 bg-gold-400 rounded-full transition-all duration-300 ${
+                  isPlaying ? 'animate-pulse' : ''
+                }`}
+                style={{
                   height: `${Math.random() * 40 + 10}px`,
                   animationDelay: `${i * 0.1}s`
                 }}

@@ -85,7 +85,7 @@ export function AudioProvider({ children }) {
   useEffect(() => {
     const savedMusicUrls = localStorage.getItem('customMusicUrls');
     const savedAudioMessages = localStorage.getItem('customAudioMessages');
-    
+
     if (savedMusicUrls) {
       try {
         const parsedUrls = JSON.parse(savedMusicUrls);
@@ -94,7 +94,7 @@ export function AudioProvider({ children }) {
         console.error('Failed to load custom music URLs:', error);
       }
     }
-    
+
     if (savedAudioMessages) {
       try {
         const parsedMessages = JSON.parse(savedAudioMessages);
@@ -152,7 +152,7 @@ export function AudioProvider({ children }) {
     puzzleComplete: '/audio/puzzle-complete.mp3'
   };
 
-  // Merge default tracks with custom URLs
+  // Merge default tracks with custom URLs - Custom URLs take priority
   const audioTracks = {
     ...defaultAudioTracks,
     // Override with custom URLs if available
@@ -174,7 +174,7 @@ export function AudioProvider({ children }) {
     }
   };
 
-  // Merge default audio messages with custom URLs
+  // Merge default audio messages with custom URLs - Custom URLs take priority
   const audioMessages = {
     ...defaultAudioMessages,
     ...state.customAudioMessages
@@ -182,9 +182,9 @@ export function AudioProvider({ children }) {
 
   const playTrack = (category, trackName) => {
     if (!state.musicEnabled) return;
-    
+
     let track = null;
-    
+
     // Check if custom URL exists for this category
     if (state.customMusicUrls[category]) {
       track = state.customMusicUrls[category];
@@ -192,34 +192,64 @@ export function AudioProvider({ children }) {
       // Fall back to default tracks
       track = audioTracks[category]?.[trackName];
     }
-    
+
     if (track) {
-      dispatch({
-        type: 'PLAY_TRACK',
-        payload: { track, category }
-      });
+      // Create and play audio element directly from URL
+      try {
+        const audio = new Audio(track);
+        audio.volume = state.isMuted ? 0 : state.volume;
+        audio.play().catch(error => {
+          console.error('Failed to play audio:', error);
+        });
+        
+        dispatch({
+          type: 'PLAY_TRACK',
+          payload: { track, category }
+        });
+      } catch (error) {
+        console.error('Error playing track:', error);
+      }
     }
   };
 
   const playAudioMessage = (messageKey) => {
     if (!state.musicEnabled) return;
-    
+
     const message = audioMessages[messageKey];
     if (message) {
-      dispatch({
-        type: 'PLAY_TRACK',
-        payload: { track: message, category: 'message' }
-      });
+      // Create and play audio element directly from URL
+      try {
+        const audio = new Audio(message);
+        audio.volume = state.isMuted ? 0 : state.volume;
+        audio.play().catch(error => {
+          console.error('Failed to play audio message:', error);
+        });
+
+        dispatch({
+          type: 'PLAY_TRACK',
+          payload: { track: message, category: 'message' }
+        });
+      } catch (error) {
+        console.error('Error playing audio message:', error);
+      }
     }
   };
 
   const playSFX = (soundName) => {
     if (!state.sfxEnabled) return;
-    
+
     const sound = audioTracks.sfx[soundName];
     if (sound) {
-      // Play sound effect (would integrate with Howler.js or HTML5 Audio)
-      console.log(`Playing SFX: ${soundName}`);
+      // Create and play sound effect directly from URL
+      try {
+        const audio = new Audio(sound);
+        audio.volume = state.isMuted ? 0 : (state.volume * 0.7); // SFX slightly quieter
+        audio.play().catch(error => {
+          console.error('Failed to play SFX:', error);
+        });
+      } catch (error) {
+        console.error('Error playing SFX:', error);
+      }
     }
   };
 
